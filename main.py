@@ -1,4 +1,8 @@
+from typing import Optional
 from fastapi import FastAPI
+from typing import Optional
+
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -7,6 +11,12 @@ def index():
     return {
         "status" : "Success", 
         "message " : "Hello world!"
+    }
+
+@app.get('/blog')
+def index(limit=5, published="Yesterday", sort : Optional[str] = None): 
+    return {
+        "data" : "All blogs till "+str(limit) + " " +published
     }
 
 @app.get('/blog/unpublished')
@@ -26,4 +36,20 @@ def singleBlogComment(id1 : int, id2):
     return {
         "id1" : id1,
         "id2" : id2
+    }
+
+
+class Blog(BaseModel):
+    title : str
+    body : str
+    published_at : Optional[bool]
+
+
+@app.post('/blog')
+def create_blog(blog : Blog) :
+    return {
+        "data" : "Blog is created",
+        "title" : blog.title,
+        "body" : blog.title,
+        "pub" : blog.published_at
     }
