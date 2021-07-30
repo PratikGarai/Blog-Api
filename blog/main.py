@@ -1,14 +1,9 @@
 from fastapi import FastAPI
 import uvicorn
-from typing import Optional
-from pydantic import BaseModel
+
+from schemas import Blog
 
 app = FastAPI()
-
-class Blog(BaseModel):
-    title : str
-    body : str
-    published_at : Optional[bool]
 
 @app.post('/blog')
 def create(request:Blog):
