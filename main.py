@@ -2,7 +2,6 @@ from typing import Optional
 from fastapi import FastAPI
 from typing import Optional
 from pydantic import BaseModel
-from starlette.routing import Host
 import uvicorn
 
 app = FastAPI()
