@@ -1,16 +1,17 @@
-from typing import List
+from typing import List, Union
 from fastapi import FastAPI, Depends, status, Response
 import uvicorn
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 
 import schemas
 import models
 from database import engine, SessionLocal
+from hashing import Hash
 
 models.Base.metadata.create_all(engine)
 
 app = FastAPI()
+hash = Hash()
 
 def get_db():
     db = SessionLocal()
@@ -112,17 +113,18 @@ def edit(
     }
 
 
-pwd_cxt = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 @app.post(
     '/user',
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    response_model=schemas.ShowUser,
 )
 def create_user(
     request : schemas.User,
     db: Session = Depends(get_db)
 ):
-    hashed_password = pwd_cxt.hash(request.password)
+    hashed_password = hash.bcrypt(request.password)
     request.password = hashed_password
     new_user = models.User(**request.__dict__)
     db.add(new_user)
@@ -130,6 +132,26 @@ def create_user(
     db.refresh(new_user)
     return new_user
 
+
+@app.get(
+    '/user/{id}',
+    response_model=Union[
+        schemas.ShowUser,
+        schemas.MessageSchema
+    ]
+)
+def get_user(
+    id : int,
+    response : Response,
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id==id)
+    if not user.first() :
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {
+            "message" : f"User {id} not found"
+        }
+    return user.first()
 
 
 if __name__=="__main__":
