@@ -68,5 +68,29 @@ def destroy(id:int, response : Response, db: Session = Depends(get_db)):
     db.commit()
 
 
+@app.put(
+    '/blog/{id}', 
+    status_code=status.HTTP_202_ACCEPTED, 
+)
+def edit(id:int, request : Blog, response : Response, db: Session = Depends(get_db)):
+    blogs = db.query(models.Blog).filter(models.Blog.id==id)
+    if(len(blogs.all())==0):
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {
+            "message" : f"Blog with id {id} not available"
+        }
+    blogs.update(
+        {
+            "title" : request.title, 
+            "body" : request.body
+        }, 
+        synchronize_session=False
+    )
+    db.commit()
+    return {
+        "message" : "Blog Updated"
+    }
+
+
 if __name__=="__main__":
     uvicorn.run(app, host="127.0.0.1", port="8000")
