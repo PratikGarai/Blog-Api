@@ -1,8 +1,8 @@
-from typing import final
+from typing import List
 from fastapi import FastAPI, Depends, status, Response
 import uvicorn
 
-from schemas import Blog
+import schemas
 import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
@@ -23,7 +23,10 @@ def get_db():
     '/blog', 
     status_code=status.HTTP_201_CREATED
 )
-def create(request:Blog, db: Session = Depends(get_db)):
+def create(
+    request:schemas.Blog, 
+    db: Session = Depends(get_db)
+    ):
     new_blog = models.Blog(title = request.title, body = request.body)
     db.add(new_blog)
     db.commit()
@@ -32,18 +35,25 @@ def create(request:Blog, db: Session = Depends(get_db)):
 
 
 @app.get(
-    '/blog'
+    '/blog',
+    response_model=List[schemas.ShowBlog]
 )
-def all_blogs(db: Session = Depends(get_db)):
+def all_blogs(
+    db: Session = Depends(get_db)
+    ):
     blogs = db.query(models.Blog).all()
     return blogs
 
 
 @app.get(
     '/blog/{id}',
-     status_code=200
+    status_code=200,
+    response_model=schemas.ShowBlog
 )
-def get_single_blog(id:int, response : Response, db: Session = Depends(get_db)):
+def get_single_blog(
+    id:int, response : Response, 
+    db: Session = Depends(get_db)
+    ):
     blog = db.query(models.Blog).filter(models.Blog.id==id).first()
     if not blog :
         response.status_code = status.HTTP_404_NOT_FOUND
@@ -57,7 +67,11 @@ def get_single_blog(id:int, response : Response, db: Session = Depends(get_db)):
     '/blog/{id}', 
     status_code=status.HTTP_204_NO_CONTENT, 
 )
-def destroy(id:int, response : Response, db: Session = Depends(get_db)):
+def destroy(
+    id:int, 
+    response : Response, 
+    db: Session = Depends(get_db)
+    ):
     blog = db.query(models.Blog).filter(models.Blog.id==id).first()
     if not blog :
         response.status_code = status.HTTP_404_NOT_FOUND
@@ -72,7 +86,12 @@ def destroy(id:int, response : Response, db: Session = Depends(get_db)):
     '/blog/{id}', 
     status_code=status.HTTP_202_ACCEPTED, 
 )
-def edit(id:int, request : Blog, response : Response, db: Session = Depends(get_db)):
+def edit(
+    id:int, 
+    request : schemas.Blog, 
+    response : Response, 
+    db: Session = Depends(get_db)
+    ):
     blogs = db.query(models.Blog).filter(models.Blog.id==id)
     if(len(blogs.all())==0):
         response.status_code = status.HTTP_404_NOT_FOUND
