@@ -1,11 +1,12 @@
 from typing import List
 from fastapi import FastAPI, Depends, status, Response
 import uvicorn
+from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
 import schemas
 import models
 from database import engine, SessionLocal
-from sqlalchemy.orm import Session
 
 models.Base.metadata.create_all(engine)
 
@@ -110,6 +111,9 @@ def edit(
         "message" : "Blog Updated"
     }
 
+
+pwd_cxt = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 @app.post(
     '/user',
     status_code=status.HTTP_201_CREATED
@@ -118,6 +122,8 @@ def create_user(
     request : schemas.User,
     db: Session = Depends(get_db)
 ):
+    hashed_password = pwd_cxt.hash(request.password)
+    request.password = hashed_password
     new_user = models.User(**request.__dict__)
     db.add(new_user)
     db.commit()
