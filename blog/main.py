@@ -26,7 +26,7 @@ def get_db():
 def create(
     request:schemas.Blog, 
     db: Session = Depends(get_db)
-    ):
+):
     new_blog = models.Blog(title = request.title, body = request.body)
     db.add(new_blog)
     db.commit()
@@ -40,7 +40,7 @@ def create(
 )
 def all_blogs(
     db: Session = Depends(get_db)
-    ):
+):
     blogs = db.query(models.Blog).all()
     return blogs
 
@@ -53,7 +53,7 @@ def all_blogs(
 def get_single_blog(
     id:int, response : Response, 
     db: Session = Depends(get_db)
-    ):
+):
     blog = db.query(models.Blog).filter(models.Blog.id==id).first()
     if not blog :
         response.status_code = status.HTTP_404_NOT_FOUND
@@ -71,7 +71,7 @@ def destroy(
     id:int, 
     response : Response, 
     db: Session = Depends(get_db)
-    ):
+):
     blog = db.query(models.Blog).filter(models.Blog.id==id).first()
     if not blog :
         response.status_code = status.HTTP_404_NOT_FOUND
@@ -91,7 +91,7 @@ def edit(
     request : schemas.Blog, 
     response : Response, 
     db: Session = Depends(get_db)
-    ):
+):
     blogs = db.query(models.Blog).filter(models.Blog.id==id)
     if(len(blogs.all())==0):
         response.status_code = status.HTTP_404_NOT_FOUND
@@ -109,6 +109,21 @@ def edit(
     return {
         "message" : "Blog Updated"
     }
+
+@app.post(
+    '/user',
+    status_code=status.HTTP_201_CREATED
+)
+def create_user(
+    request : schemas.User,
+    db: Session = Depends(get_db)
+):
+    new_user = models.User(**request.__dict__)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
 
 
 if __name__=="__main__":
