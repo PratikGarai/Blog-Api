@@ -23,7 +23,8 @@ def get_db():
 
 @app.post(
     '/blog', 
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    tags = ["Blog"]
 )
 def create(
     request:schemas.Blog, 
@@ -38,7 +39,8 @@ def create(
 
 @app.get(
     '/blog',
-    response_model=List[schemas.ShowBlog]
+    response_model=List[schemas.ShowBlog],
+    tags = ["Blog"]
 )
 def all_blogs(
     db: Session = Depends(get_db)
@@ -50,7 +52,8 @@ def all_blogs(
 @app.get(
     '/blog/{id}',
     status_code=200,
-    response_model=schemas.ShowBlog
+    response_model=schemas.ShowBlog,
+    tags = ["Blog"]
 )
 def get_single_blog(
     id:int, response : Response, 
@@ -68,6 +71,7 @@ def get_single_blog(
 @app.delete(
     '/blog/{id}', 
     status_code=status.HTTP_204_NO_CONTENT, 
+    tags = ["Blog"]
 )
 def destroy(
     id:int, 
@@ -87,6 +91,7 @@ def destroy(
 @app.put(
     '/blog/{id}', 
     status_code=status.HTTP_202_ACCEPTED, 
+    tags = ["Blog"]
 )
 def edit(
     id:int, 
@@ -119,6 +124,7 @@ def edit(
     '/user',
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.ShowUser,
+    tags = ["User"]
 )
 def create_user(
     request : schemas.User,
@@ -138,7 +144,8 @@ def create_user(
     response_model=Union[
         schemas.ShowUser,
         schemas.MessageSchema
-    ]
+    ],
+    tags = ["User"]
 )
 def get_user(
     id : int,
