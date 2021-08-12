@@ -61,3 +61,13 @@ class MessageSchema(BaseModel):
 class Login(BaseModel) :
     username : str
     password : str
+
+
+class TokenData(BaseModel):
+    user_id : int
+    username : str
+
+
+class AuthResponse(BaseModel):
+    token : str
+    token_type : str

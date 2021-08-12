@@ -5,6 +5,7 @@ import schemas
 import database
 import models
 import hashing
+import jwtToken
 
 router = APIRouter(
     tags=["Auth"],
@@ -22,7 +23,7 @@ def get_db():
 
 @router.post(
     '/login',
-    response_model=schemas.ShowUser
+    response_model=schemas.AuthResponse
 )
 def login(
     request : schemas.Login, 
@@ -39,4 +40,14 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid Credentials"
         )
-    return user
+
+    token = jwtToken.create_access_token(
+        data = {
+            "username" : user.username,
+            "user_id" : user.id
+        }
+    )
+    return {
+        "token" : token, 
+        "token_type" : "bearer"
+    }
