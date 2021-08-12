@@ -10,15 +10,26 @@ class Blog(BaseModel):
 
 class User(BaseModel):
     name : str
+    username : str
     email : str
     password : str
 
 
-class ShowBlog(Blog):
+class BlogAuthor(BaseModel) :
     id : int
+    username : str
     name : str
     email : str
-    author : User
+
+    class Config() :
+        orm_mode = True
+
+
+class ShowBlog(Blog):
+    id : int
+    title : str
+    body : str
+    author : BlogAuthor
 
     class Config() :
         orm_mode = True
@@ -35,6 +46,7 @@ class UserBlog(BaseModel):
 
 class ShowUser(BaseModel):
     name : str
+    username : str
     email : str
     blogs : List[UserBlog]
 
@@ -44,3 +56,8 @@ class ShowUser(BaseModel):
 
 class MessageSchema(BaseModel):
     message : str
+
+
+class Login(BaseModel) :
+    username : str
+    password : str

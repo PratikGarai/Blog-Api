@@ -6,7 +6,10 @@ import models
 import schemas
 import database
 
-router = APIRouter()
+router = APIRouter(
+    tags = ["Blog"],
+    prefix="/blog"
+)
 
 def get_db():
     db = database.SessionLocal()
@@ -17,9 +20,8 @@ def get_db():
         
 
 @router.post(
-    '/blog', 
-    status_code=status.HTTP_201_CREATED,
-    tags = ["Blog"]
+    '', 
+    status_code=status.HTTP_201_CREATED
 )
 def create(
     request:schemas.Blog, 
@@ -33,9 +35,8 @@ def create(
 
 
 @router.get(
-    '/blog',
-    response_model=List[schemas.ShowBlog],
-    tags = ["Blog"]
+    '',
+    response_model=List[schemas.ShowBlog]
 )
 def all_blogs(
     db: Session = Depends(get_db)
@@ -45,10 +46,9 @@ def all_blogs(
 
 
 @router.get(
-    '/blog/{id}',
+    '/{id}',
     status_code=200,
-    response_model=schemas.ShowBlog,
-    tags = ["Blog"]
+    response_model=schemas.ShowBlog
 )
 def get_single_blog(
     id:int, response : Response, 
@@ -64,9 +64,8 @@ def get_single_blog(
 
 
 @router.delete(
-    '/blog/{id}', 
-    status_code=status.HTTP_204_NO_CONTENT, 
-    tags = ["Blog"]
+    '/{id}', 
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 def destroy(
     id:int, 
@@ -84,9 +83,8 @@ def destroy(
 
 
 @router.put(
-    '/blog/{id}', 
-    status_code=status.HTTP_202_ACCEPTED, 
-    tags = ["Blog"]
+    '/{id}', 
+    status_code=status.HTTP_202_ACCEPTED,
 )
 def edit(
     id:int, 

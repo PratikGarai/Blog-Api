@@ -7,7 +7,11 @@ import schemas
 import database
 import hashing
 
-router = APIRouter()
+router = APIRouter(
+    tags = ["User"],
+    prefix="/user"
+)
+
 hash = hashing.Hash()
 
 def get_db():
@@ -19,10 +23,9 @@ def get_db():
 
 
 @router.post(
-    '/user',
+    '',
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.ShowUser,
-    tags = ["User"]
+    response_model=schemas.ShowUser
 )
 def create_user(
     request : schemas.User,
@@ -38,12 +41,11 @@ def create_user(
 
 
 @router.get(
-    '/user/{id}',
+    '/{id}',
     response_model=Union[
         schemas.ShowUser,
         schemas.MessageSchema
-    ],
-    tags = ["User"]
+    ]
 )
 def get_user(
     id : int,
